@@ -4,7 +4,7 @@ const isOSIApproved = require('spdx-is-osi')
 const correct = require('spdx-correct')
 
 const packageJsonRaw = fs.readFileSync('./package.json').toString()
-const packageJsonLines = packageJson.split("\n")
+const packageJsonLines = packageJsonRaw.split("\n")
 const packageJson = JSON.parse(packageJsonRaw)
 const packageLock = JSON.parse(fs.readFileSync('./package-lock.json').toString())
 
