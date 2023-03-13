@@ -51,7 +51,7 @@ function isOnPositiveList(licenseType) {
 
 function getWarningsNGSeverity(licenseType) {
     if (!licenseType) {
-        return 'ERROR'
+        return 'HIGH'
     }
 
     const spdxId = correct(licenseType)
@@ -60,7 +60,7 @@ function getWarningsNGSeverity(licenseType) {
             return 'NORMAL'
         }
 
-        return 'ERROR'
+        return 'HIGH'
     }
 
     if (isOSIApproved(spdxId)) {
@@ -71,7 +71,7 @@ function getWarningsNGSeverity(licenseType) {
         return 'NORMAL'
     }
 
-    return 'HIGH'
+    return 'ERROR'
 }
 
 function isRootDependency(packageName) {
