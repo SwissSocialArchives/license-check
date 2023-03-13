@@ -1,0 +1,9 @@
+{
+  "name": "license-check",
+  "version": "0.1.0",
+  "license": "MIT",
+  "dependencies": {
+    "spdx-is-osi": "^1.0.0",
+    "spdx-correct": "^3.2.0"
+  }
+}
