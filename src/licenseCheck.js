@@ -4,7 +4,6 @@ const isOSIApproved = require('spdx-is-osi')
 const correct = require('spdx-correct')
 
 const packageJsonRaw = fs.readFileSync('./package.json').toString()
-const packageJsonLines = packageJsonRaw.split("\n")
 const packageJson = JSON.parse(packageJsonRaw)
 const packageLock = JSON.parse(fs.readFileSync('./package-lock.json').toString())
 
@@ -134,9 +133,10 @@ function getDependencyTree(packageName) {
     return tree.reverse()
 }
 
-function getLineNumber() {
+function getLineNumber(packageJsonRaw) {
     let i = 1
-    for (const line of packageJsonLines) {
+    const lines = packageJsonRaw.split('\n')
+    for (const line of lines) {
         if (line.includes('"license"') || '"licenses"') {
             return i
         }
@@ -166,7 +166,8 @@ function processPackageList(parentPath) {
 function processPackageDir(packageName, packageParent) {
     const packageJsonPath = path.join(packageParent, packageName, 'package.json')
     if (fs.existsSync(packageJsonPath)) {
-        const packageJsonData = JSON.parse(fs.readFileSync(packageJsonPath).toString())
+        const packageJsonRaw = fs.readFileSync(packageJsonPath).toString()
+        const packageJsonData = JSON.parse(packageJsonRaw)
         const licenseType = extractLicense(packageJsonData)
         const severity = getWarningsNGSeverity(licenseType)
         const dependencyTree = getDependencyTree(packageName)
@@ -174,7 +175,7 @@ function processPackageDir(packageName, packageParent) {
             packageName,
             type: licenseType ?? 'n/a',
             fileName: packageJsonPath,
-            lineStart: getLineNumber(),
+            lineStart: getLineNumber(packageJsonRaw),
             severity,
             message: 'Dependency tree',
             description: dependencyTree.join(' → ')
