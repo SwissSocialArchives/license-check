@@ -43,23 +43,41 @@ function extractLicense(packageJSONContent) {
     return undefined
 }
 
-const positiveList = ['CC-BY-4.0']
+const positiveList = ['CC-BY-4.0', 'Unlicense']
+
+function isOnPositiveList(licenseType) {
+    for (const p of positiveList) {
+        if (licenseType.includes(p)) {
+            return true
+        }
+    }
+
+    return false
+}
 
 function getWarningsNGSeverity(licenseType) {
     if (!licenseType) {
         return 'ERROR'
     }
 
-    if (positiveList.includes(licenseType)) {
-        return 'NORMAL'
-    }
-
     const spdxId = correct(licenseType)
     if (!spdxId) {
+        if (isOnPositiveList) {
+            return 'NORMAL'
+        }
+
         return 'ERROR'
     }
 
-    return isOSIApproved(spdxId) ? 'LOW' : 'HIGH'
+    if (isOSIApproved(spdxId)) {
+        return 'LOW'
+    }
+
+    if (isOnPositiveList) {
+        return 'NORMAL'
+    }
+
+    return 'HIGH'
 }
 
 function isRootDependency(packageName) {
