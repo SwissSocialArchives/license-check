@@ -107,8 +107,8 @@ function getDependencyTree(packageName) {
     while (parent && !isRootDependency(parent) && i < 100) {
         if (dependencyTreeCache[parent]) {
             const result = [...tree, ...dependencyTreeCache[parent]]
-            for (let i = 0; i < result.length; i++) {
-                dependencyTreeCache[result[i]] = result.slice(i)
+            for (let j = 0; j < result.length; j++) {
+                dependencyTreeCache[result[j]] = result.slice(j)
             }
             return result.reverse()
         }
@@ -126,8 +126,8 @@ function getDependencyTree(packageName) {
         }
     }
 
-    for (let i = 0; i < tree.length; i++) {
-        dependencyTreeCache[tree[i]] = tree.slice(i)
+    for (let j = 0; j < tree.length; j++) {
+        dependencyTreeCache[tree[j]] = tree.slice(j)
     }
 
     return tree.reverse()
