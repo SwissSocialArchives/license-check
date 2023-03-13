@@ -3,6 +3,7 @@ const path = require('path')
 const isOSIApproved = require('spdx-is-osi')
 const correct = require('spdx-correct')
 
+const nodeModulesPath = './node_modules'
 const packageJsonRaw = fs.readFileSync('./package.json').toString()
 const packageJson = JSON.parse(packageJsonRaw)
 const packageLock = JSON.parse(fs.readFileSync('./package-lock.json').toString())
@@ -145,26 +146,35 @@ function getLineNumber(packageJsonRaw) {
     return undefined
 }
 
-function processPackageList(parentPath) {
-    const parentList = fs.readdirSync(parentPath)
-    for (const p of parentList) {
-        if (p.startsWith('.') || !fs.lstatSync(path.join(parentPath, p)).isDirectory()) {
+function processPackages() {
+    const parentList = fs.readdirSync(nodeModulesPath)
+    for (const packageName of parentList) {
+        if (packageName.startsWith('.') || !fs.lstatSync(path.join(nodeModulesPath, packageName)).isDirectory()) {
             continue
         }
-        if (p.startsWith('@')) {
-            if (p.startsWith('@types')) {
+        if (packageName.startsWith('@')) {
+            if (packageName.startsWith('@types')) {
                 continue
             }
-            processPackageList(path.join(parentPath, p))
+            const namespaceParentList = fs.readdirSync(path.join(nodeModulesPath, packageName))
+            for (const namespacePackageName of namespaceParentList) {
+                if (
+                    packageName.startsWith('.') ||
+                    !fs.lstatSync(path.join(nodeModulesPath, packageName, namespacePackageName)).isDirectory())
+                {
+                    continue
+                }
+                processPackageDir(path.join(packageName, namespacePackageName))
+            }
             continue
         }
 
-        processPackageDir(p, parentPath)
+        processPackageDir(packageName)
     }
 }
 
-function processPackageDir(packageName, packageParent) {
-    const packageJsonPath = path.join(packageParent, packageName, 'package.json')
+function processPackageDir(packageName) {
+    const packageJsonPath = path.join(nodeModulesPath, packageName, 'package.json')
     if (fs.existsSync(packageJsonPath)) {
         const packageJsonRaw = fs.readFileSync(packageJsonPath).toString()
         const packageJsonData = JSON.parse(packageJsonRaw)
@@ -183,6 +193,6 @@ function processPackageDir(packageName, packageParent) {
     }
 }
 
-processPackageList('./node_modules')
+processPackages()
 
-fs.writeFileSync('./licenseReport.json', JSON.stringify({issues}))
+fs.writeFileSync('./licenseReport.json', JSON.stringify({issues},  null, 2))
