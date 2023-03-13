@@ -43,7 +43,7 @@ function extractLicense(packageJSONContent) {
     return undefined
 }
 
-const positiveList = ['CC-BY-4.0', 'Unlicense']
+const positiveList = ['CC0-', 'CC-BY-', 'Unlicense']
 
 function isOnPositiveList(licenseType) {
     for (const p of positiveList) {
