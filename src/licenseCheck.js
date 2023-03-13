@@ -137,7 +137,7 @@ function getLineNumber(packageJsonRaw) {
     let i = 1
     const lines = packageJsonRaw.split('\n')
     for (const line of lines) {
-        if (line.includes('"license"') || '"licenses"') {
+        if (line.includes('"license"') || line.includes('"licenses"')) {
             return i
         }
         i++
