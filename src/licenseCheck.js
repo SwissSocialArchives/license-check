@@ -27,23 +27,28 @@ function extractLicense(packageJSONContent) {
     if (Array.isArray(packageJSONContent.licenses)) {
         const licenseTypes = []
         for (const license of packageJSONContent.licenses) {
-            const l = extractLicense(license)
+            const l = extractLicense({license})
             if (l) {
-                licenseTypes.push(l);
+                licenseTypes.push(l)
             }
         }
-        return licenseTypes.length > 0 ? '(' + licenseTypes.join(' OR ') + ')' : undefined;
+        if (licenseTypes.length === 1) {
+            return licenseTypes[0]
+        }
+        if (licenseTypes.length > 1) {
+            return '('  + licenseTypes.join(' OR ') + ')'
+        }
     }
 
     return undefined
 }
 
-function getWarningsNGSeverity(licenseTypes) {
-    if (!licenseTypes) {
+function getWarningsNGSeverity(licenseType) {
+    if (!licenseType) {
         return 'ERROR'
     }
 
-    const spdxId = correct(licenseTypes)
+    const spdxId = correct(licenseType)
     if (!spdxId) {
         return 'ERROR'
     }
@@ -78,7 +83,7 @@ function getDependencyTree(packageName) {
         return []
     }
 
-    let tree = [packageName];
+    let tree = [packageName]
     let parent = packageName
     let i = 1
     while (parent && !isRootDependency(parent) && i < 100) {
@@ -96,7 +101,7 @@ function getDependencyTree(packageName) {
             }
             return false
 
-        }).map(e => e[0].split('node_modules/').reverse()[0])[0] ?? undefined;
+        }).map(e => e[0].split('node_modules/').reverse()[0])[0] ?? undefined
 
         if (parent) {
             tree.push(parent)
@@ -107,18 +112,21 @@ function getDependencyTree(packageName) {
         dependencyTreeCache[tree[i]] = tree.slice(i)
     }
 
-    return tree.reverse();
+    return tree.reverse()
 }
 
 function processPackageList(parentPath) {
-    const parentList = fs.readdirSync(parentPath);
+    const parentList = fs.readdirSync(parentPath)
     for (const p of parentList) {
         if (p.startsWith('.') || !fs.lstatSync(path.join(parentPath, p)).isDirectory()) {
-            continue;
+            continue
         }
         if (p.startsWith('@')) {
+            if (p.startsWith('@types')) {
+                continue
+            }
             processPackageList(path.join(parentPath, p))
-            continue;
+            continue
         }
 
         processPackageDir(p, parentPath)
@@ -126,20 +134,20 @@ function processPackageList(parentPath) {
 }
 
 function processPackageDir(packageName, packageParent) {
-    const packageJsonPath = path.join(packageParent, packageName, 'package.json');
+    const packageJsonPath = path.join(packageParent, packageName, 'package.json')
     if (fs.existsSync(packageJsonPath)) {
         const packageJsonData = JSON.parse(fs.readFileSync(packageJsonPath).toString())
-        const licenseTypes = extractLicense(packageJsonData)
-        const severity = getWarningsNGSeverity(licenseTypes)
+        const licenseType = extractLicense(packageJsonData)
+        const severity = getWarningsNGSeverity(licenseType)
         const dependencyTree = getDependencyTree(packageName)
         issues.push({
             packageName,
-            type: licenseTypes ?? 'n/a',
+            type: licenseType ?? 'n/a',
             fileName: packageJsonPath,
             severity,
             message: 'Dependency tree',
             description: dependencyTree.join(' → ')
-        });
+        })
     }
 }
 
