@@ -25,9 +25,12 @@ function extractLicense(packageJSONContent) {
     }
 
     if (Array.isArray(packageJSONContent.licenses)) {
-        let licenseTypes = []
+        const licenseTypes = []
         for (const license of packageJSONContent.licenses) {
-            licenseTypes = [...licenseTypes, ...(extractLicense({license}) ?? [])];
+            const l = extractLicense(license)
+            if (l) {
+                licenseTypes.push();
+            }
         }
         return licenseTypes.length > 0 ? '(' + licenseTypes.join(' OR ') + ')' : undefined;
     }
