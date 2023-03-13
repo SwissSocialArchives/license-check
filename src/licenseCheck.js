@@ -43,16 +43,10 @@ function extractLicense(packageJSONContent) {
     return undefined
 }
 
-const positiveList = ['CC0-', 'CC-BY-', 'Unlicense']
+const positiveList = ['CC0-1.0', 'CC-BY-4.0', 'Unlicense']
 
 function isOnPositiveList(licenseType) {
-    for (const p of positiveList) {
-        if (licenseType.includes(p)) {
-            return true
-        }
-    }
-
-    return false
+    return positiveList.includes(licenseType)
 }
 
 function getWarningsNGSeverity(licenseType) {
