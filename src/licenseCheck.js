@@ -43,9 +43,15 @@ function extractLicense(packageJSONContent) {
     return undefined
 }
 
+const positiveList = ['CC-BY-4.0']
+
 function getWarningsNGSeverity(licenseType) {
     if (!licenseType) {
         return 'ERROR'
+    }
+
+    if (positiveList.includes(licenseType)) {
+        return 'NORMAL'
     }
 
     const spdxId = correct(licenseType)
