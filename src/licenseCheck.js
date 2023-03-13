@@ -29,7 +29,7 @@ function extractLicense(packageJSONContent) {
         for (const license of packageJSONContent.licenses) {
             const l = extractLicense(license)
             if (l) {
-                licenseTypes.push();
+                licenseTypes.push(l);
             }
         }
         return licenseTypes.length > 0 ? '(' + licenseTypes.join(' OR ') + ')' : undefined;
