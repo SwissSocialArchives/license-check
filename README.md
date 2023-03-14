@@ -12,7 +12,7 @@ Checks if all licenses in package.json are osi conform.
 2. Build Environment: Enable "Provide Node & npm bin/ folder to PATH"
 3. Build Steps: Add "Execute shell" with the following command:
    ```
-   npm install
+   npm i --package-lock-only
    git -C license-check pull || git clone https://github.com/SwissSocialArchives/license-check.git license-check
    cd license-check
    npm install
